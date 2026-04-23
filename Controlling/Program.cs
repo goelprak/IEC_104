@@ -90,7 +90,12 @@ namespace IEC104Simulator
 
         private byte[] CreateUFrame(byte controlField)
         {
-            return new byte[] { 0x68, 0x04, 0x00, 0x00, 0x00, controlField };
+            // U-frame: bit 0-1 = 11 for U-frame type
+            // STARTDT-ACT = 0x07 -> 0x00 0x00 0x00 0x07 actually has wrong encoding!
+            // Proper U-frame: first 2 bits should be '11'
+            // Correct: 0x68, 0x04, 0x00, 0x00, 0x00, controlField
+            // But RTU expects: 0x68, 0x04, 0x03, 0x00, 0x00, 0x07 for STARTDT-ACT
+            return new byte[] { 0x68, 0x04, 0x03, 0x00, 0x00, controlField };
         }
 
         private byte[] CreateIFrame(byte typeId, byte cot, byte[] data, int asduAddr = 1)

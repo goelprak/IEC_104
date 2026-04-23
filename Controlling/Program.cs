@@ -88,7 +88,8 @@ namespace IEC104Simulator
                 _sendSeq = (byte)((_sendSeq + 2) & 0xFE);
                 
                 int asduLen = 6 + data.Length;
-                var frame = new byte[6 + asduLen];
+                int frameLen = 6 + asduLen;
+                var frame = new byte[frameLen];
                 
                 frame[0] = 0x68;
                 frame[1] = (byte)asduLen;
@@ -105,7 +106,8 @@ namespace IEC104Simulator
                 frame[11] = (byte)((asduAddr >> 8) & 0xFF);
                 frame[12] = 0x00;
                 
-                Array.Copy(data, 0, frame, 13, data.Length);
+                if (data.Length > 0)
+                    Array.Copy(data, 0, frame, 13, Math.Min(data.Length, frameLen - 13));
                 
                 return frame;
             }

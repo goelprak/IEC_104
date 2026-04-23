@@ -63,10 +63,23 @@ namespace IEC104Simulator
         {
             var frame = CreateUFrame(0x07);
             await _stream!.WriteAsync(frame, 0, frame.Length);
-            await Task.Delay(100);
+            await Task.Delay(200);
             var response = new byte[6];
-            try { await _stream.ReadAsync(response, 0, response.Length); }
+            int bytesRead = 0;
+            try { bytesRead = await _stream.ReadAsync(response, 0, response.Length); }
             catch { }
+            
+            if (bytesRead > 0)
+            {
+                if (response[5] == 0x0B)
+                {
+                    Console.WriteLine("[*] STARTDT-CON received");
+                }
+                else if (response[5] == 0x43)
+                {
+                    Console.WriteLine("[*] TESTFR-CON received");
+                }
+            }
         }
 
         private async Task SendStartDtConAsync()
